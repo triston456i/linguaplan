@@ -4,6 +4,11 @@ A small self-hosted web app that turns a folder tree on your Windows file
 share into a login-protected photo gallery you can browse from a phone or
 browser, at home or remotely.
 
+For the people you share access with, there's a Chinese-language user guide:
+[USER_GUIDE.zh-CN.md](USER_GUIDE.zh-CN.md) (covers signing in, browsing
+albums, viewing photos/videos, and signing out — this README is for whoever
+sets the app up).
+
 - Runs directly on the Windows machine that hosts the share (no SMB/network
   auth to deal with — it reads the local disk path).
 - Login required (per-user accounts, sessions, rate-limited login).
