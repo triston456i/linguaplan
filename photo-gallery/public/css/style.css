@@ -113,6 +113,10 @@ main {
   z-index: 100;
 }
 
+.lightbox[hidden] {
+  display: none;
+}
+
 .lightbox img {
   max-width: 92vw;
   max-height: 92vh;
