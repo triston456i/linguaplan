@@ -15,13 +15,14 @@
 <main>
   <div id="folders" class="folder-row"></div>
   <div id="grid" class="grid"></div>
-  <p id="empty" class="empty" hidden>No photos in this folder.</p>
+  <p id="empty" class="empty" hidden>No photos or videos in this folder.</p>
 </main>
 
 <div id="lightbox" class="lightbox" hidden>
   <button id="lbClose" class="lb-btn lb-close" aria-label="Close">&times;</button>
   <button id="lbPrev" class="lb-btn lb-prev" aria-label="Previous">&#8249;</button>
   <img id="lbImage" alt="">
+  <video id="lbVideo" controls playsinline></video>
   <button id="lbNext" class="lb-btn lb-next" aria-label="Next">&#8250;</button>
 </div>
 

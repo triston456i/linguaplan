@@ -7,11 +7,12 @@
 
   const lightbox = document.getElementById('lightbox');
   const lbImage = document.getElementById('lbImage');
+  const lbVideo = document.getElementById('lbVideo');
   const lbClose = document.getElementById('lbClose');
   const lbPrev = document.getElementById('lbPrev');
   const lbNext = document.getElementById('lbNext');
 
-  let currentPhotos = [];
+  let currentItems = [];
   let currentPath = '';
   let lightboxIndex = -1;
 
@@ -60,18 +61,26 @@
     });
   }
 
-  function renderPhotos(photos, relPath) {
+  function renderItems(items, relPath) {
     gridEl.innerHTML = '';
-    currentPhotos = photos.map((name) => joinPath(relPath, name));
+    currentItems = items.map((item) => ({ ...item, path: joinPath(relPath, item.name) }));
 
-    photos.forEach((name, index) => {
+    currentItems.forEach((item, index) => {
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
       const img = document.createElement('img');
       img.loading = 'lazy';
-      img.src = '/api/thumbnail?path=' + encodeURIComponent(joinPath(relPath, name));
-      img.alt = name;
+      img.src = '/api/thumbnail?path=' + encodeURIComponent(item.path);
+      img.alt = item.name;
       thumb.appendChild(img);
+
+      if (item.type === 'video') {
+        const playIcon = document.createElement('span');
+        playIcon.className = 'play-icon';
+        playIcon.textContent = '▶';
+        thumb.appendChild(playIcon);
+      }
+
       thumb.addEventListener('click', () => openLightbox(index));
       gridEl.appendChild(thumb);
     });
@@ -96,8 +105,8 @@
 
     const data = await res.json();
     renderFolders(data.folders, relPath);
-    renderPhotos(data.photos, relPath);
-    emptyEl.hidden = data.photos.length > 0;
+    renderItems(data.items, relPath);
+    emptyEl.hidden = data.items.length > 0;
   }
 
   function navigate(relPath, replace) {
@@ -112,31 +121,47 @@
 
   function openLightbox(index) {
     lightboxIndex = index;
-    updateLightboxImage();
+    updateLightboxMedia();
     lightbox.hidden = false;
   }
 
   function closeLightbox() {
     lightbox.hidden = true;
     lbImage.src = '';
+    lbVideo.pause();
+    lbVideo.removeAttribute('src');
+    lbVideo.load();
   }
 
-  function updateLightboxImage() {
-    const filePath = currentPhotos[lightboxIndex];
-    if (!filePath) return;
-    lbImage.src = '/api/photo?path=' + encodeURIComponent(filePath);
+  function updateLightboxMedia() {
+    const item = currentItems[lightboxIndex];
+    if (!item) return;
+
+    if (item.type === 'video') {
+      lbImage.style.display = 'none';
+      lbImage.src = '';
+      lbVideo.style.display = 'block';
+      lbVideo.src = '/api/media?path=' + encodeURIComponent(item.path);
+      lbVideo.load();
+    } else {
+      lbVideo.pause();
+      lbVideo.style.display = 'none';
+      lbVideo.removeAttribute('src');
+      lbImage.style.display = 'block';
+      lbImage.src = '/api/media?path=' + encodeURIComponent(item.path);
+    }
   }
 
   function showPrev() {
-    if (currentPhotos.length === 0) return;
-    lightboxIndex = (lightboxIndex - 1 + currentPhotos.length) % currentPhotos.length;
-    updateLightboxImage();
+    if (currentItems.length === 0) return;
+    lightboxIndex = (lightboxIndex - 1 + currentItems.length) % currentItems.length;
+    updateLightboxMedia();
   }
 
   function showNext() {
-    if (currentPhotos.length === 0) return;
-    lightboxIndex = (lightboxIndex + 1) % currentPhotos.length;
-    updateLightboxImage();
+    if (currentItems.length === 0) return;
+    lightboxIndex = (lightboxIndex + 1) % currentItems.length;
+    updateLightboxMedia();
   }
 
   lbClose.addEventListener('click', closeLightbox);
@@ -148,7 +173,11 @@
 
   document.addEventListener('keydown', (e) => {
     if (lightbox.hidden) return;
-    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'Escape') {
+      closeLightbox();
+      return;
+    }
+    if (e.target === lbVideo) return;
     if (e.key === 'ArrowLeft') showPrev();
     if (e.key === 'ArrowRight') showNext();
   });

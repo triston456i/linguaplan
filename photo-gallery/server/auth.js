@@ -1,16 +1,25 @@
 const path = require('path');
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const db = require('./db');
 
 const router = express.Router();
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts, try again later.' },
+});
 
 router.get('/login', (req, res) => {
   if (req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', loginLimiter, (req, res) => {
   const { username, password } = req.body || {};
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 

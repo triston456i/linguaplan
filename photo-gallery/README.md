@@ -8,9 +8,12 @@ browser, at home or remotely.
   auth to deal with — it reads the local disk path).
 - Login required (per-user accounts, sessions, rate-limited login).
 - Folders become browsable albums; click a photo for a full-size lightbox
-  view with next/prev navigation.
+  view with next/prev navigation, or click a video to play it inline.
+- Supports common video formats too: mp4, mov, m4v, webm, mkv, avi, wmv,
+  flv, mpg/mpeg, 3gp. Videos get a poster-frame thumbnail in the grid and
+  stream with seek support (no need to fully download before scrubbing).
 - Thumbnails are generated once and cached on disk, so browsing large photo
-  folders stays fast.
+  and video folders stays fast.
 
 ## 1. Install Node.js
 
@@ -24,6 +27,9 @@ Open a terminal in this folder and run:
 ```
 npm install
 ```
+
+This also pulls in a bundled ffmpeg binary (used to generate video poster
+thumbnails) — no separate ffmpeg install needed.
 
 ## 3. Configure
 
