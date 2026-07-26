@@ -1,0 +1,5 @@
+{
+  "photoRoot": "D:\\Shared\\Photos",
+  "port": 8080,
+  "sessionSecret": "replace-with-a-long-random-string"
+}
