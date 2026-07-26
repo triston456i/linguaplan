@@ -1,0 +1,23 @@
+{
+  "name": "photo-gallery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted web photo gallery for a Windows file share",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "add-user": "node scripts/add-user.js",
+    "install-service": "node install-service.js",
+    "uninstall-service": "node uninstall-service.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "node-windows": "^1.0.0-beta.8",
+    "sharp": "^0.33.5"
+  }
+}
