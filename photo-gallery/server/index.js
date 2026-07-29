@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const session = require('express-session');
-const archiver = require('archiver');
+const { ZipArchive } = require('archiver');
 
 const config = require('./config');
 const { router: authRouter, requireLogin } = require('./auth');
@@ -90,7 +90,7 @@ app.post('/api/download-zip', (req, res) => {
   }
 
   res.attachment('photos.zip');
-  const archive = archiver('zip', { zlib: { level: 6 } });
+  const archive = new ZipArchive({ zlib: { level: 6 } });
   archive.on('error', () => res.end());
   archive.pipe(res);
 
