@@ -12,9 +12,15 @@
   const lbPrev = document.getElementById('lbPrev');
   const lbNext = document.getElementById('lbNext');
 
+  const selectionBar = document.getElementById('selectionBar');
+  const selectionCountEl = document.getElementById('selectionCount');
+  const selectionCancelBtn = document.getElementById('selectionCancelBtn');
+  const selectionDownloadBtn = document.getElementById('selectionDownloadBtn');
+
   let currentItems = [];
   let currentPath = '';
   let lightboxIndex = -1;
+  const selected = new Set();
 
   function pathFromLocation() {
     const params = new URLSearchParams(window.location.search);
@@ -63,6 +69,8 @@
 
   function renderItems(items, relPath) {
     gridEl.innerHTML = '';
+    selected.clear();
+    updateSelectionBar();
     currentItems = items.map((item) => ({ ...item, path: joinPath(relPath, item.name) }));
 
     currentItems.forEach((item, index) => {
@@ -81,10 +89,77 @@
         thumb.appendChild(playIcon);
       }
 
+      const selectToggle = document.createElement('button');
+      selectToggle.type = 'button';
+      selectToggle.className = 'select-toggle';
+      selectToggle.setAttribute('aria-label', 'Select ' + item.name);
+      selectToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSelect(item.path, thumb);
+      });
+      thumb.appendChild(selectToggle);
+
       thumb.addEventListener('click', () => openLightbox(index));
       gridEl.appendChild(thumb);
     });
   }
+
+  function toggleSelect(itemPath, thumbEl) {
+    if (selected.has(itemPath)) {
+      selected.delete(itemPath);
+      thumbEl.classList.remove('selected');
+    } else {
+      selected.add(itemPath);
+      thumbEl.classList.add('selected');
+    }
+    updateSelectionBar();
+  }
+
+  function updateSelectionBar() {
+    const count = selected.size;
+    selectionBar.hidden = count === 0;
+    selectionCountEl.textContent = count === 1 ? '1 item selected' : `${count} items selected`;
+  }
+
+  function clearSelection() {
+    selected.clear();
+    gridEl.querySelectorAll('.thumb.selected').forEach((el) => el.classList.remove('selected'));
+    updateSelectionBar();
+  }
+
+  async function downloadSelection() {
+    const paths = Array.from(selected);
+    if (paths.length === 0) return;
+
+    if (paths.length === 1) {
+      window.location.href = '/api/download?path=' + encodeURIComponent(paths[0]);
+      return;
+    }
+
+    const res = await fetch('/api/download-zip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paths }),
+    });
+
+    if (!res.ok) {
+      alert('Download failed. Please try again.');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'photos.zip';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  selectionCancelBtn.addEventListener('click', clearSelection);
+  selectionDownloadBtn.addEventListener('click', downloadSelection);
 
   async function load(relPath) {
     currentPath = relPath;
