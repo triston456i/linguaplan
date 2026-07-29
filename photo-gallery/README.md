@@ -58,7 +58,7 @@ Edit `config.json`:
 - `sessionSecret`: a long random string, used to sign login sessions. Change
   it from the placeholder before starting the server.
 
-## 4. Create accounts for family/friends
+## 4. Manage accounts for family/friends
 
 ```
 npm run add-user
@@ -67,6 +67,14 @@ npm run add-user
 Run this once per person who needs access. It prompts for a username and
 password and stores a bcrypt-hashed password in a local SQLite database
 (`data/app.db`).
+
+Other account management commands:
+
+```
+npm run list-users      # show all accounts
+npm run set-password    # reset an existing account's password
+npm run remove-user     # delete an account (asks for confirmation)
+```
 
 ## 5. Test it
 

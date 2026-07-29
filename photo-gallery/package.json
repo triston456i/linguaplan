@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node server/index.js",
     "add-user": "node scripts/add-user.js",
+    "list-users": "node scripts/list-users.js",
+    "remove-user": "node scripts/remove-user.js",
+    "set-password": "node scripts/set-password.js",
     "install-service": "node install-service.js",
     "uninstall-service": "node uninstall-service.js"
   },
